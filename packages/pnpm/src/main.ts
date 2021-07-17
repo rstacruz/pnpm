@@ -174,9 +174,11 @@ export default async function run (inputArgv: string[]) {
     config.filter = config.filter ?? []
     config.filterProd = config.filterProd ?? []
 
+    const extendFilterPattern = (filter: string) => (filter.match(/^[a-z]/) != null) ? `@*/${filter}` : filter
+
     const filters = [
-      ...config.filter.map((filter) => ({ filter, followProdDepsOnly: false })),
-      ...config.filterProd.map((filter) => ({ filter, followProdDepsOnly: true })),
+      ...config.filter.map((filter) => extendFilterPattern(filter)).map((filter) => ({ filter, followProdDepsOnly: false })),
+      ...config.filterProd.map((filter) => extendFilterPattern(filter)).map((filter) => ({ filter, followProdDepsOnly: true })),
     ]
 
     const filterResults = await filterPackages(allProjects, filters, {
